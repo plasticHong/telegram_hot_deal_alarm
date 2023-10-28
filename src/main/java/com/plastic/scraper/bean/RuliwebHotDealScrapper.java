@@ -51,19 +51,22 @@ public class RuliwebHotDealScrapper {
         }
 
         hotDealRecordRepo.save(new HotDealRecord(originalHotDealUrl));
+
         return scrapingResponse;
     }
 
     private void ruliwebLastDataSave(ScrapingResult scrapedLastData) {
 
-        Optional<RuliwebLastData> byId = ruliwebLastDataRepo.findById(25L);
+        Optional<RuliwebLastData> byId = ruliwebLastDataRepo.findAll()
+                .stream()
+                .findFirst();
 
         if (byId.isEmpty()){return;}
 
         byId.get().setTitle(scrapedLastData.getTitle());
     }
 
-    public String getOriginalHotDealUrl(ScrapingResult scrapingResult){
+    private String getOriginalHotDealUrl(ScrapingResult scrapingResult){
 
         String scrapedPageUrl = scrapingResult.getUrl();
 
@@ -75,7 +78,7 @@ public class RuliwebHotDealScrapper {
     }
 
 
-    public Optional<ScrapingResult> ruliwebScrapingAndFindNewArticle(String lastData) {
+    private Optional<ScrapingResult> ruliwebScrapingAndFindNewArticle(String lastData) {
 
         List<ScrapingResult> responseList;
 

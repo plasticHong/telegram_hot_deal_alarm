@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,18 +18,21 @@ import java.util.Optional;
 public class ScrapingManager {
 
     private final TelegramBot telegramBot;
-    private final HotDealRecordRepo hotDealRecordRepo;
 
     private final RuliwebHotDealScrapper ruliwebScrapper;
 
     public void scrapingAndMessageSend(){
-        Optional<ScrapingResult> scrappingResponse = ruliwebScrapper.doScraping();
 
-        scrappingResponse.ifPresent(response -> telegramBot.messageSend(response.getUrl()));
+        List<Optional<ScrapingResult>> scrapingResultList = new ArrayList<>();
+
+        scrapingResultList.add(ruliwebScrapper.doScraping());
+
+        scrapingResultList.forEach(optional->
+                 optional.ifPresent(scrapingResult ->
+                         telegramBot.messageSend(scrapingResult.getUrl())
+                 )
+        );
+
     }
-
-
-
-
 
 }
