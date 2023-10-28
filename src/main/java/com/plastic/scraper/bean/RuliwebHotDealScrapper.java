@@ -1,7 +1,9 @@
 package com.plastic.scraper.bean;
 
-import com.plastic.scraper.dto.ScrapingResponse;
+import com.plastic.scraper.dto.ScrapingResult;
+import com.plastic.scraper.entity.HotDealRecord;
 import com.plastic.scraper.entity.RuliwebLastData;
+import com.plastic.scraper.repository.HotDealRecordRepo;
 import com.plastic.scraper.repository.RuliwebLastDataRepo;
 import com.plastic.scraper.util.GlobalUtil;
 import lombok.RequiredArgsConstructor;
@@ -23,24 +25,36 @@ public class RuliwebHotDealScrapper {
     private final static String URL = "https://bbs.ruliweb.com/market/board/1020?page=";
 
     private final RuliwebLastDataRepo ruliwebLastDataRepo;
+    private final HotDealRecordRepo hotDealRecordRepo;
+
 
     @Transactional
-    public Optional<ScrapingResponse> doScraping() {
+    public Optional<ScrapingResult> doScraping() {
 
         RuliwebLastData savedLastData = ruliwebLastDataRepo.findAll().stream().findFirst().orElse(new RuliwebLastData());
 
-        Optional<ScrapingResponse> scrapingResponse = ruliwebScrapingAndFindNewArticle(savedLastData.getTitle());
+        Optional<ScrapingResult> scrapingResponse = ruliwebScrapingAndFindNewArticle(savedLastData.getTitle());
 
         if (scrapingResponse.isEmpty()) {
             return Optional.empty();
         }
 
-        ruliwebLastDataSave(scrapingResponse.get());
+        ScrapingResult scrapingResult = scrapingResponse.get();
+        ruliwebLastDataSave(scrapingResult);
 
+        String originalHotDealUrl = getOriginalHotDealUrl(scrapingResult);
+
+        Optional<HotDealRecord> hotDealRecord = hotDealRecordRepo.findByUrl(originalHotDealUrl);
+
+        if (hotDealRecord.isPresent()) {
+            return Optional.empty();
+        }
+
+        hotDealRecordRepo.save(new HotDealRecord(originalHotDealUrl));
         return scrapingResponse;
     }
 
-    private void ruliwebLastDataSave(ScrapingResponse scrapedLastData) {
+    private void ruliwebLastDataSave(ScrapingResult scrapedLastData) {
 
         Optional<RuliwebLastData> byId = ruliwebLastDataRepo.findById(25L);
 
@@ -49,9 +63,21 @@ public class RuliwebHotDealScrapper {
         byId.get().setTitle(scrapedLastData.getTitle());
     }
 
-    public Optional<ScrapingResponse> ruliwebScrapingAndFindNewArticle(String lastData) {
+    public String getOriginalHotDealUrl(ScrapingResult scrapingResult){
 
-        List<ScrapingResponse> responseList;
+        String scrapedPageUrl = scrapingResult.getUrl();
+
+        Elements select = GlobalUtil.getDocumentByUrl(scrapedPageUrl)
+                .select(".source_url")
+                .select("a");
+
+        return select.text();
+    }
+
+
+    public Optional<ScrapingResult> ruliwebScrapingAndFindNewArticle(String lastData) {
+
+        List<ScrapingResult> responseList;
 
         OptionalInt matchingIdxByLastData;
 
@@ -63,7 +89,7 @@ public class RuliwebHotDealScrapper {
             Elements aTags = findElement(document);
 
             responseList = aTags.stream()
-                    .map(e -> new ScrapingResponse(e.text(), e.attr("href"))).toList();
+                    .map(e -> new ScrapingResult(e.text(), e.attr("href"))).toList();
 
             matchingIdxByLastData = GlobalUtil.findMatchingIdxByLastData(responseList, lastData);
 
@@ -81,7 +107,7 @@ public class RuliwebHotDealScrapper {
             return Optional.empty();
         }
 
-        List<ScrapingResponse> list = responseList.subList(0, matchingIndex).stream().toList();
+        List<ScrapingResult> list = responseList.subList(0, matchingIndex).stream().toList();
         return Optional.ofNullable(list.get(list.size() - 1));
     }
 

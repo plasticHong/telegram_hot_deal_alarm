@@ -1,6 +1,6 @@
 package com.plastic.scraper.util;
 
-import com.plastic.scraper.dto.ScrapingResponse;
+import com.plastic.scraper.dto.ScrapingResult;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
 
 public class GlobalUtil {
 
-    public static OptionalInt findMatchingIdxByLastData(List<ScrapingResponse> responseList, String lastDataTitle) {
+    public static OptionalInt findMatchingIdxByLastData(List<ScrapingResult> responseList, String lastDataTitle) {
 
         if (lastDataTitle==null){
             return OptionalInt.of(0);
@@ -27,6 +27,17 @@ public class GlobalUtil {
         if (pageNum != 1) {
             url += pageNum;
         }
+
+        try {
+            document = Jsoup.connect(url).get();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return document;
+    }
+
+    public static Document getDocumentByUrl(String url) {
+        Document document;
 
         try {
             document = Jsoup.connect(url).get();
