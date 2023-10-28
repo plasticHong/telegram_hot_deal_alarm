@@ -1,6 +1,6 @@
 package com.plastic.scraper.util;
 
-import com.plastic.scraper.dto.ScrappingResponse;
+import com.plastic.scraper.dto.ScrapingResponse;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
 
 public class GlobalUtil {
 
-    public static OptionalInt findMatchingIdxByLastData(List<ScrappingResponse> responseList, String lastDataTitle) {
+    public static OptionalInt findMatchingIdxByLastData(List<ScrapingResponse> responseList, String lastDataTitle) {
 
         if (lastDataTitle==null){
             return OptionalInt.of(0);

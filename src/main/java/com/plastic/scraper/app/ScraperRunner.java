@@ -8,14 +8,14 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @EnableScheduling
-public class ScrapperRunner {
+public class ScraperRunner {
 
-    private static final Long EVERY_MINUTE = 60000L;
-    private final ScrappingManager scrappingManager;
+    private static final long EVERY_MINUTE = 60000;
+    private final ScrapingManager scrapingManager;
 
     @Scheduled(fixedDelay = EVERY_MINUTE)
     public void run() {
-        scrappingManager.scrappingAndMessageSend();
+        scrapingManager.scrapingAndMessageSend();
     }
 
 

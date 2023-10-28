@@ -1,6 +1,6 @@
 package com.plastic.scraper.bean;
 
-import com.plastic.scraper.dto.ScrappingResponse;
+import com.plastic.scraper.dto.ScrapingResponse;
 import com.plastic.scraper.entity.RuliwebLastData;
 import com.plastic.scraper.repository.RuliwebLastDataRepo;
 import com.plastic.scraper.util.GlobalUtil;
@@ -25,22 +25,22 @@ public class RuliwebHotDealScrapper {
     private final RuliwebLastDataRepo ruliwebLastDataRepo;
 
     @Transactional
-    public Optional<ScrappingResponse> doScrapping() {
+    public Optional<ScrapingResponse> doScraping() {
 
         RuliwebLastData savedLastData = ruliwebLastDataRepo.findAll().stream().findFirst().orElse(new RuliwebLastData());
 
-        Optional<ScrappingResponse> scrappingResponse = ruliwebScrappingAndFindNewArticle(savedLastData.getTitle());
+        Optional<ScrapingResponse> scrapingResponse = ruliwebScrapingAndFindNewArticle(savedLastData.getTitle());
 
-        if (scrappingResponse.isEmpty()) {
+        if (scrapingResponse.isEmpty()) {
             return Optional.empty();
         }
 
-        ruliwebLastDataSave(scrappingResponse.get());
+        ruliwebLastDataSave(scrapingResponse.get());
 
-        return scrappingResponse;
+        return scrapingResponse;
     }
 
-    private void ruliwebLastDataSave(ScrappingResponse scrapedLastData) {
+    private void ruliwebLastDataSave(ScrapingResponse scrapedLastData) {
 
         Optional<RuliwebLastData> byId = ruliwebLastDataRepo.findById(25L);
 
@@ -49,9 +49,9 @@ public class RuliwebHotDealScrapper {
         byId.get().setTitle(scrapedLastData.getTitle());
     }
 
-    public Optional<ScrappingResponse> ruliwebScrappingAndFindNewArticle(String lastData) {
+    public Optional<ScrapingResponse> ruliwebScrapingAndFindNewArticle(String lastData) {
 
-        List<ScrappingResponse> responseList;
+        List<ScrapingResponse> responseList;
 
         OptionalInt matchingIdxByLastData;
 
@@ -63,7 +63,7 @@ public class RuliwebHotDealScrapper {
             Elements aTags = findElement(document);
 
             responseList = aTags.stream()
-                    .map(e -> new ScrappingResponse(e.text(), e.attr("href"))).toList();
+                    .map(e -> new ScrapingResponse(e.text(), e.attr("href"))).toList();
 
             matchingIdxByLastData = GlobalUtil.findMatchingIdxByLastData(responseList, lastData);
 
@@ -81,7 +81,7 @@ public class RuliwebHotDealScrapper {
             return Optional.empty();
         }
 
-        List<ScrappingResponse> list = responseList.subList(0, matchingIndex).stream().toList();
+        List<ScrapingResponse> list = responseList.subList(0, matchingIndex).stream().toList();
         return Optional.ofNullable(list.get(list.size() - 1));
     }
 

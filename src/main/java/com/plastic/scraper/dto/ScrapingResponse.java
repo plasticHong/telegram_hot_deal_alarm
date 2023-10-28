@@ -9,7 +9,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @AllArgsConstructor
-public class ScrappingResponse {
+public class ScrapingResponse {
     private String title;
     private String link;
 
