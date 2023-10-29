@@ -4,7 +4,6 @@ import com.plastic.scraper.app.bean.FmKoreaHotDealScraper;
 import com.plastic.scraper.app.bean.PpomPpuHotDealScraper;
 import com.plastic.scraper.app.bean.RuliwebHotDealScraper;
 import com.plastic.scraper.app.bean.TelegramBot;
-import com.plastic.scraper.dto.ScrapingResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

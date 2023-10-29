@@ -1,6 +1,6 @@
-package com.plastic.scraper.util;
+package com.plastic.scraper.app.util;
 
-import com.plastic.scraper.dto.ScrapingResult;
+import com.plastic.scraper.app.ScrapingResult;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 

@@ -1,11 +1,11 @@
 package com.plastic.scraper.app.bean;
 
-import com.plastic.scraper.dto.ScrapingResult;
+import com.plastic.scraper.app.ScrapingResult;
 import com.plastic.scraper.entity.PpomPpuLastData;
 import com.plastic.scraper.entity.HotDealRecord;
 import com.plastic.scraper.repository.PpomPpuLastDataRepo;
 import com.plastic.scraper.repository.HotDealRecordRepo;
-import com.plastic.scraper.util.GlobalUtil;
+import com.plastic.scraper.app.util.GlobalUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Document;

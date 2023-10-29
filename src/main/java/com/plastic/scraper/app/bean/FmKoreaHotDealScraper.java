@@ -1,11 +1,11 @@
 package com.plastic.scraper.app.bean;
 
-import com.plastic.scraper.dto.ScrapingResult;
+import com.plastic.scraper.app.ScrapingResult;
 import com.plastic.scraper.entity.FmKoreaLastData;
 import com.plastic.scraper.entity.HotDealRecord;
 import com.plastic.scraper.repository.FmKoreaLastDataRepo;
 import com.plastic.scraper.repository.HotDealRecordRepo;
-import com.plastic.scraper.util.GlobalUtil;
+import com.plastic.scraper.app.util.GlobalUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Document;
@@ -28,7 +28,6 @@ public class FmKoreaHotDealScraper {
     private final FmKoreaLastDataRepo fmKoreaLastDataRepo;
     private final HotDealRecordRepo hotDealRecordRepo;
 
-
     @Transactional
     public Optional<ScrapingResult> doScraping() {
 
@@ -44,7 +43,6 @@ public class FmKoreaHotDealScraper {
         ruliwebLastDataSave(scrapingResult);
 
         String originalHotDealUrl = getOriginalHotDealUrl(scrapingResult);
-
         Optional<HotDealRecord> hotDealRecord = hotDealRecordRepo.findByUrl(originalHotDealUrl);
 
         if (hotDealRecord.isPresent()) {
@@ -114,7 +112,6 @@ public class FmKoreaHotDealScraper {
 
         return GlobalUtil.getScrapingResult(responseList, matchingIdxByLastData);
     }
-
 
     private Elements findElement(Document document) {
         return document

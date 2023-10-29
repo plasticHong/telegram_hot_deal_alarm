@@ -10,7 +10,7 @@ https://t.me/plastic_hong
 텔레그램 체널로 메시지를 발송합니다
 
 
-## scraping target website list (can be add)
+## scraping target website list (can be added)
 - 루리웹
 - 뽐뿌
 - FM korea
