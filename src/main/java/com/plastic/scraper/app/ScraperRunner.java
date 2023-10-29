@@ -14,7 +14,7 @@ public class ScraperRunner {
     private static final long TEN_SEC = 10000;
     private final ScrapingManager scrapingManager;
 
-    @Scheduled(fixedDelay = TEN_SEC)
+    @Scheduled(fixedDelay = EVERY_MINUTE)
     public void run() {
         scrapingManager.scrapingAndMessageSend();
     }
