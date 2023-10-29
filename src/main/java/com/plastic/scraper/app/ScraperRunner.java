@@ -11,9 +11,10 @@ import org.springframework.stereotype.Component;
 public class ScraperRunner {
 
     private static final long EVERY_MINUTE = 60000;
+    private static final long TEN_SEC = 10000;
     private final ScrapingManager scrapingManager;
 
-    @Scheduled(fixedDelay = EVERY_MINUTE)
+    @Scheduled(fixedDelay = TEN_SEC)
     public void run() {
         scrapingManager.scrapingAndMessageSend();
     }

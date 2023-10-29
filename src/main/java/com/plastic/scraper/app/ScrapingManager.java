@@ -1,12 +1,10 @@
 package com.plastic.scraper.app;
 
-import com.plastic.scraper.bean.RuliwebHotDealScrapper;
-import com.plastic.scraper.bean.TelegramBot;
+import com.plastic.scraper.app.bean.PpomPpuHotDealScraper;
+import com.plastic.scraper.app.bean.RuliwebHotDealScraper;
+import com.plastic.scraper.app.bean.TelegramBot;
 import com.plastic.scraper.dto.ScrapingResult;
-import com.plastic.scraper.repository.HotDealRecordRepo;
-import com.plastic.scraper.util.GlobalUtil;
 import lombok.RequiredArgsConstructor;
-import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,17 +17,19 @@ public class ScrapingManager {
 
     private final TelegramBot telegramBot;
 
-    private final RuliwebHotDealScrapper ruliwebScrapper;
+    private final RuliwebHotDealScraper ruliwebScrapper;
+    private final PpomPpuHotDealScraper ppomPpuScraper;
 
     public void scrapingAndMessageSend(){
 
         List<Optional<ScrapingResult>> scrapingResultList = new ArrayList<>();
 
         scrapingResultList.add(ruliwebScrapper.doScraping());
+        scrapingResultList.add(ppomPpuScraper.doScraping());
 
         scrapingResultList.forEach(optional->
                  optional.ifPresent(scrapingResult ->
-                         telegramBot.messageSend(scrapingResult.getUrl())
+                         telegramBot.messageSendWithApache(scrapingResult.getUrl())
                  )
         );
 

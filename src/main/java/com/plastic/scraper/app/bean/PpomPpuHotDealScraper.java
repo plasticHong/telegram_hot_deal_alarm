@@ -1,10 +1,10 @@
-package com.plastic.scraper.bean;
+package com.plastic.scraper.app.bean;
 
 import com.plastic.scraper.dto.ScrapingResult;
+import com.plastic.scraper.entity.PpomPpuLastData;
 import com.plastic.scraper.entity.HotDealRecord;
-import com.plastic.scraper.entity.RuliwebLastData;
+import com.plastic.scraper.repository.PpomPpuLastDataRepo;
 import com.plastic.scraper.repository.HotDealRecordRepo;
-import com.plastic.scraper.repository.RuliwebLastDataRepo;
 import com.plastic.scraper.util.GlobalUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,20 +20,20 @@ import java.util.OptionalInt;
 @Component
 @Log4j2
 @RequiredArgsConstructor
-public class RuliwebHotDealScrapper {
+public class PpomPpuHotDealScraper {
 
-    private final static String URL = "https://bbs.ruliweb.com/market/board/1020?page=";
+    private final static String URL = "https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu&page=";
 
-    private final RuliwebLastDataRepo ruliwebLastDataRepo;
+    private final PpomPpuLastDataRepo ppomPpuLastDataRepo;
     private final HotDealRecordRepo hotDealRecordRepo;
 
 
     @Transactional
     public Optional<ScrapingResult> doScraping() {
 
-        RuliwebLastData savedLastData = ruliwebLastDataRepo.findAll().stream().findFirst().orElse(new RuliwebLastData());
+        PpomPpuLastData savedLastData = ppomPpuLastDataRepo.findAll().stream().findFirst().orElse(new PpomPpuLastData());
 
-        Optional<ScrapingResult> scrapingResponse = ruliwebScrapingAndFindNewArticle(savedLastData.getTitle());
+        Optional<ScrapingResult> scrapingResponse = ppomppuScrapingAndFindNewArticle(savedLastData.getTitle());
 
         if (scrapingResponse.isEmpty()) {
             return Optional.empty();
@@ -57,7 +57,7 @@ public class RuliwebHotDealScrapper {
 
     private void ruliwebLastDataSave(ScrapingResult scrapedLastData) {
 
-        Optional<RuliwebLastData> byId = ruliwebLastDataRepo.findAll()
+        Optional<PpomPpuLastData> byId = ppomPpuLastDataRepo.findAll()
                 .stream()
                 .findFirst();
 
@@ -71,14 +71,14 @@ public class RuliwebHotDealScrapper {
         String scrapedPageUrl = scrapingResult.getUrl();
 
         Elements select = GlobalUtil.getDocumentByUrl(scrapedPageUrl)
-                .select(".source_url")
+                .select(".wordfix")
                 .select("a");
 
         return select.text();
     }
 
 
-    private Optional<ScrapingResult> ruliwebScrapingAndFindNewArticle(String lastData) {
+    private Optional<ScrapingResult> ppomppuScrapingAndFindNewArticle(String lastData) {
 
         List<ScrapingResult> responseList;
 
@@ -91,8 +91,10 @@ public class RuliwebHotDealScrapper {
             Document document = GlobalUtil.getDocumentByUrl(URL, pageNum);
             Elements aTags = findElement(document);
 
+            String ppomppuPreFix = "https://www.ppomppu.co.kr/zboard/";
+
             responseList = aTags.stream()
-                    .map(e -> new ScrapingResult(e.text(), e.attr("href"))).toList();
+                    .map(e -> new ScrapingResult(e.select("font").text(), ppomppuPreFix+e.attr("href"))).toList();
 
             matchingIdxByLastData = GlobalUtil.findMatchingIdxByLastData(responseList, lastData);
 
@@ -116,9 +118,10 @@ public class RuliwebHotDealScrapper {
 
     private Elements findElement(Document document) {
         return document
-                .select("tr:not(.inside)")
-                .select("tr:not(.notice)")
-                .select(".deco")
+                .select(".list_vspace")
+                .select("tr")
+                .select("td")
+                .select("div")
                 .select("a");
     }
 
