@@ -10,11 +10,10 @@ https://t.me/plastic_hong
 텔레그램 체널로 메시지를 발송합니다
 
 
-## scraping target website list (maintained)
+## scraping target website list (can be add)
 - 루리웹
-
-[//]: # (- FM korea)
-[//]: # (- 뽐뿌)
+- 뽐뿌
+- FM korea
 
 ## version info
 - SpringBoot 3.1.4
