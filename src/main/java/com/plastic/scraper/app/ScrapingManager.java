@@ -31,7 +31,7 @@ public class ScrapingManager {
 
         scrapingResultList.forEach(optional->
                  optional.ifPresent(scrapingResult ->
-                         telegramBot.messageSendWithApache(scrapingResult.getUrl())
+                         telegramBot.messageSend(scrapingResult)
                  )
         );
 

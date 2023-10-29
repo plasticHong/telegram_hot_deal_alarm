@@ -1,5 +1,6 @@
 package com.plastic.scraper.app.bean;
 
+import com.plastic.scraper.app.ScrapingResult;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
@@ -20,15 +23,17 @@ public class TelegramBot {
     @Value("${telegram.bot.chat-id}")
     private String chatId;
 
-    public void messageSendWithApache(String rawUri)  {
+    public void messageSend(ScrapingResult scrapingResult)  {
 
-        String replaced = rawUri.replace("&", "%26");
+        String escapedUri = scrapingResult.getUrl().replace("&", "%26");
+        String encodedMessage = URLEncoder.encode(scrapingResult.getTitle(), StandardCharsets.UTF_8);
 
         String apiUrl = "https://api.telegram.org/bot" +
                 token + "/sendmessage?chat_id=" +
                 chatId +
                 "&text=" +
-                replaced;
+                encodedMessage+
+                escapedUri;
 
         HttpClient httpClient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(apiUrl);
