@@ -1,5 +1,6 @@
 package com.plastic.scraper.app;
 
+import com.plastic.scraper.app.bean.FmKoreaHotDealScraper;
 import com.plastic.scraper.app.bean.PpomPpuHotDealScraper;
 import com.plastic.scraper.app.bean.RuliwebHotDealScraper;
 import com.plastic.scraper.app.bean.TelegramBot;
@@ -19,6 +20,7 @@ public class ScrapingManager {
 
     private final RuliwebHotDealScraper ruliwebScrapper;
     private final PpomPpuHotDealScraper ppomPpuScraper;
+    private final FmKoreaHotDealScraper fmKoreaScraper;
 
     public void scrapingAndMessageSend(){
 
@@ -26,6 +28,7 @@ public class ScrapingManager {
 
         scrapingResultList.add(ruliwebScrapper.doScraping());
         scrapingResultList.add(ppomPpuScraper.doScraping());
+        scrapingResultList.add(fmKoreaScraper.doScraping());
 
         scrapingResultList.forEach(optional->
                  optional.ifPresent(scrapingResult ->

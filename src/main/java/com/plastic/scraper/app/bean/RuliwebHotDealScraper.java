@@ -92,7 +92,7 @@ public class RuliwebHotDealScraper {
             Elements aTags = findElement(document);
 
             responseList = aTags.stream()
-                    .map(e -> new ScrapingResult(e.text(), e.attr("href"))).toList();
+                    .map(e -> new ScrapingResult(e.text().trim(), e.attr("href"))).toList();
 
             matchingIdxByLastData = GlobalUtil.findMatchingIdxByLastData(responseList, lastData);
 
@@ -104,14 +104,7 @@ public class RuliwebHotDealScraper {
 
         } while (matchingIdxByLastData.isEmpty());
 
-        int matchingIndex = matchingIdxByLastData.getAsInt();
-
-        if (matchingIndex == 0) {
-            return Optional.empty();
-        }
-
-        List<ScrapingResult> list = responseList.subList(0, matchingIndex).stream().toList();
-        return Optional.ofNullable(list.get(list.size() - 1));
+        return GlobalUtil.getScrapingResult(responseList, matchingIdxByLastData);
     }
 
     private Elements findElement(Document document) {
