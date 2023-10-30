@@ -40,6 +40,8 @@ public class FmKoreaHotDealScraper {
         }
 
         ScrapingResult scrapingResult = scrapingResponse.get();
+
+        System.out.println("scrapingResult = " + scrapingResult);
         ruliwebLastDataSave(scrapingResult);
 
         String originalHotDealUrl = getOriginalHotDealUrl(scrapingResult);
@@ -48,7 +50,6 @@ public class FmKoreaHotDealScraper {
         if (hotDealRecord.isPresent()) {
             return Optional.empty();
         }
-
         hotDealRecordRepo.save(new HotDealRecord(originalHotDealUrl));
 
         return scrapingResponse;
@@ -65,6 +66,7 @@ public class FmKoreaHotDealScraper {
         }
 
         byId.get().setTitle(scrapedLastData.getTitle());
+        byId.get().setArticleId(scrapedLastData.getArticleId());
     }
 
     private String getOriginalHotDealUrl(ScrapingResult scrapingResult) {

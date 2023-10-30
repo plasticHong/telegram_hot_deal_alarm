@@ -64,6 +64,7 @@ public class PpomPpuHotDealScraper {
         if (byId.isEmpty()){return;}
 
         byId.get().setTitle(scrapedLastData.getTitle());
+        byId.get().setArticleId(scrapedLastData.getArticleId());
     }
 
     private String getOriginalHotDealUrl(ScrapingResult scrapingResult){

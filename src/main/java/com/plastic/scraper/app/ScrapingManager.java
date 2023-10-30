@@ -30,9 +30,7 @@ public class ScrapingManager {
         scrapingResultList.add(fmKoreaScraper.doScraping());
 
         scrapingResultList.forEach(optional->
-                 optional.ifPresent(scrapingResult ->
-                         telegramBot.messageSend(scrapingResult)
-                 )
+                 optional.ifPresent(telegramBot::messageSend)
         );
 
     }

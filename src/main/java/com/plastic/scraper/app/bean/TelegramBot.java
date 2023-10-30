@@ -2,6 +2,7 @@ package com.plastic.scraper.app.bean;
 
 import com.plastic.scraper.app.ScrapingResult;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
