@@ -30,7 +30,7 @@ public class GlobalUtil {
         }
 
         return IntStream.range(0, responseList.size())
-                .filter(index -> responseList.get(index).getTitle().equals(lastDataTitle)).findFirst();
+                .filter(index -> responseList.get(index).getArticleId().equals(lastDataTitle)).findFirst();
     }
 
     public static Document getDocumentByUrl(String url, Integer pageNum) {

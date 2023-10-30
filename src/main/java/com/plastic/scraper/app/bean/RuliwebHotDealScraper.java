@@ -33,7 +33,7 @@ public class RuliwebHotDealScraper {
 
         RuliwebLastData savedLastData = ruliwebLastDataRepo.findAll().stream().findFirst().orElse(new RuliwebLastData());
 
-        Optional<ScrapingResult> scrapingResponse = ruliwebScrapingAndFindNewArticle(savedLastData.getTitle());
+        Optional<ScrapingResult> scrapingResponse = ruliwebScrapingAndFindNewArticle(savedLastData.getArticleId());
 
         if (scrapingResponse.isEmpty()) {
             return Optional.empty();
@@ -63,6 +63,7 @@ public class RuliwebHotDealScraper {
 
         if (byId.isEmpty()){return;}
 
+        byId.get().setArticleId(scrapedLastData.getArticleId());
         byId.get().setTitle(scrapedLastData.getTitle());
     }
 
@@ -92,8 +93,15 @@ public class RuliwebHotDealScraper {
             Elements aTags = findElement(document);
 
             responseList = aTags.stream()
-                    .map(e -> new ScrapingResult(e.text().trim(), e.attr("href"))).toList();
-
+                    .map(e ->
+                            new ScrapingResult(
+                                    e.select(".id").text().trim(),
+                                    e.select(".deco").select("a").text().trim(),
+                                    e.select(".deco").select("a").attr("href")
+                            )
+                    )
+                    .toList();
+            
             matchingIdxByLastData = GlobalUtil.findMatchingIdxByLastData(responseList, lastData);
 
             if (matchingIdxByLastData.isEmpty()) {
@@ -109,10 +117,9 @@ public class RuliwebHotDealScraper {
 
     private Elements findElement(Document document) {
         return document
+                .select("tbody")
                 .select("tr:not(.inside)")
-                .select("tr:not(.notice)")
-                .select(".deco")
-                .select("a");
+                .select("tr:not(.notice)");
     }
 
 }

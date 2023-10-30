@@ -19,6 +19,9 @@ public class RuliwebLastData {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "article_id")
+    private String articleId;
+
     @Column(name = "title")
     private String title;
 

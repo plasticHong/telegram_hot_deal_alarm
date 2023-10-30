@@ -26,7 +26,7 @@ public class TelegramBot {
     public void messageSend(ScrapingResult scrapingResult)  {
 
         String escapedUri = scrapingResult.getUrl().replace("&", "%26");
-        String encodedMessage = URLEncoder.encode(scrapingResult.getTitle(), StandardCharsets.UTF_8);
+        String encodedMessage = URLEncoder.encode(scrapingResult.getTitle()+" ", StandardCharsets.UTF_8);
 
         String apiUrl = "https://api.telegram.org/bot" +
                 token + "/sendmessage?chat_id=" +

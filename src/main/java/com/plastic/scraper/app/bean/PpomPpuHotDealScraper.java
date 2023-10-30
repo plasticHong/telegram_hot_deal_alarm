@@ -33,7 +33,7 @@ public class PpomPpuHotDealScraper {
 
         PpomPpuLastData savedLastData = ppomPpuLastDataRepo.findAll().stream().findFirst().orElse(new PpomPpuLastData());
 
-        Optional<ScrapingResult> scrapingResponse = ppomppuScrapingAndFindNewArticle(savedLastData.getTitle());
+        Optional<ScrapingResult> scrapingResponse = ppomppuScrapingAndFindNewArticle(savedLastData.getArticleId());
 
         if (scrapingResponse.isEmpty()) {
             return Optional.empty();
@@ -94,7 +94,25 @@ public class PpomPpuHotDealScraper {
             String ppomppuPreFix = "https://www.ppomppu.co.kr/zboard/";
 
             responseList = aTags.stream()
-                    .map(e -> new ScrapingResult(e.select("font").text().trim(), ppomppuPreFix+e.attr("href"))).toList();
+                    .map(element -> new ScrapingResult(
+                            element
+                                    .select(":first-child")
+                                    .first().text().trim(),
+                            element.select("tbody")
+                                    .select("tr")
+                                    .select("td")
+                                    .select("div")
+                                    .select("a")
+                                    .select("font").text().trim(),
+                            ppomppuPreFix+element
+                                    .select("tbody")
+                                    .select("tr")
+                                    .select("td")
+                                    .select("div")
+                                    .select("a")
+                                    .attr("href"))
+                    )
+                    .toList();
 
             matchingIdxByLastData = GlobalUtil.findMatchingIdxByLastData(responseList, lastData);
 
@@ -110,12 +128,8 @@ public class PpomPpuHotDealScraper {
     }
 
     private Elements findElement(Document document) {
-        return document
-                .select(".list_vspace")
-                .select("tr")
-                .select("td")
-                .select("div")
-                .select("a");
+        return document.select("tbody")
+                .select(".common-list1,.common-list0");
     }
 
 }

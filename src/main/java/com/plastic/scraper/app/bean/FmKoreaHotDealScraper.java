@@ -33,7 +33,7 @@ public class FmKoreaHotDealScraper {
 
         FmKoreaLastData savedLastData = fmKoreaLastDataRepo.findAll().stream().findFirst().orElse(new FmKoreaLastData());
 
-        Optional<ScrapingResult> scrapingResponse = fmKoreaScrapingAndFindNewArticle(savedLastData.getTitle());
+        Optional<ScrapingResult> scrapingResponse = fmKoreaScrapingAndFindNewArticle(savedLastData.getArticleId());
 
         if (scrapingResponse.isEmpty()) {
             return Optional.empty();
@@ -97,8 +97,16 @@ public class FmKoreaHotDealScraper {
             String pattern = "\\s\\[\\d+\\]";
             Pattern regex = Pattern.compile(pattern);
 
+
             responseList = aTags.stream()
-                    .map(e -> new ScrapingResult(regex.matcher(e.text()).replaceAll("").trim(), fmKoreaPreFix + e.attr("href"))).toList();
+                    .map(element ->
+                            new ScrapingResult(
+                                    element.attr("href").replace("/","").trim(),
+                                    regex.matcher(element.text()).replaceAll(""),
+                                fmKoreaPreFix + element.attr("href")
+                            )
+                    )
+                    .toList();
 
             matchingIdxByLastData = GlobalUtil.findMatchingIdxByLastData(responseList, lastData);
 
