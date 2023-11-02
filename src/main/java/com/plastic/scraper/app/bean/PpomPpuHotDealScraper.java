@@ -61,13 +61,15 @@ public class PpomPpuHotDealScraper {
                 .stream()
                 .findFirst();
 
-        if (byId.isEmpty()){return;}
+        if (byId.isEmpty()) {
+            return;
+        }
 
         byId.get().setTitle(scrapedLastData.getTitle());
         byId.get().setArticleId(scrapedLastData.getArticleId());
     }
 
-    private String getOriginalHotDealUrl(ScrapingResult scrapingResult){
+    private String getOriginalHotDealUrl(ScrapingResult scrapingResult) {
 
         String scrapedPageUrl = scrapingResult.getUrl();
 
@@ -85,45 +87,37 @@ public class PpomPpuHotDealScraper {
 
         OptionalInt matchingIdxByLastData;
 
-        int pageNum = 1;
+        Document document = GlobalUtil.getDocumentByUrl(URL);
+        Elements aTags = findElement(document);
 
-        do {
+        String ppomppuPreFix = "https://www.ppomppu.co.kr/zboard/";
 
-            Document document = GlobalUtil.getDocumentByUrl(URL, pageNum);
-            Elements aTags = findElement(document);
+        responseList = aTags.stream()
+                .map(element -> new ScrapingResult(
+                        element
+                                .select(":first-child")
+                                .first().text().trim(),
+                        element.select("tbody")
+                                .select("tr")
+                                .select("td")
+                                .select("div")
+                                .select("a")
+                                .select("font").text().trim(),
+                        ppomppuPreFix + element
+                                .select("tbody")
+                                .select("tr")
+                                .select("td")
+                                .select("div")
+                                .select("a")
+                                .attr("href"))
+                )
+                .toList();
 
-            String ppomppuPreFix = "https://www.ppomppu.co.kr/zboard/";
+        matchingIdxByLastData = GlobalUtil.findMatchingIdxByLastData(responseList, lastData);
 
-            responseList = aTags.stream()
-                    .map(element -> new ScrapingResult(
-                            element
-                                    .select(":first-child")
-                                    .first().text().trim(),
-                            element.select("tbody")
-                                    .select("tr")
-                                    .select("td")
-                                    .select("div")
-                                    .select("a")
-                                    .select("font").text().trim(),
-                            ppomppuPreFix+element
-                                    .select("tbody")
-                                    .select("tr")
-                                    .select("td")
-                                    .select("div")
-                                    .select("a")
-                                    .attr("href"))
-                    )
-                    .toList();
-
-            matchingIdxByLastData = GlobalUtil.findMatchingIdxByLastData(responseList, lastData);
-
-            if (matchingIdxByLastData.isEmpty()) {
-                log.info("일치하는 단어가 없습니다. 다음 페이지에서 다시 가조오세요");
-            }
-
-            pageNum += 1;
-
-        } while (matchingIdxByLastData.isEmpty());
+        if (matchingIdxByLastData.isEmpty()) {
+            matchingIdxByLastData = OptionalInt.of(1);
+        }
 
         return GlobalUtil.getScrapingResult(responseList, matchingIdxByLastData);
     }

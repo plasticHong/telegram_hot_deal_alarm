@@ -41,7 +41,6 @@ public class FmKoreaHotDealScraper {
 
         ScrapingResult scrapingResult = scrapingResponse.get();
 
-        System.out.println("scrapingResult = " + scrapingResult);
         ruliwebLastDataSave(scrapingResult);
 
         String originalHotDealUrl = getOriginalHotDealUrl(scrapingResult);
@@ -87,38 +86,30 @@ public class FmKoreaHotDealScraper {
 
         OptionalInt matchingIdxByLastData;
 
-        int pageNum = 1;
+        Document document = GlobalUtil.getDocumentByUrl(URL);
+        Elements aTags = findElement(document);
 
-        do {
+        String fmKoreaPreFix = "https://www.fmkorea.com";
 
-            Document document = GlobalUtil.getDocumentByUrl(URL, pageNum);
-            Elements aTags = findElement(document);
-
-            String fmKoreaPreFix = "https://www.fmkorea.com";
-
-            String pattern = "\\s\\[\\d+\\]";
-            Pattern regex = Pattern.compile(pattern);
+        String pattern = "\\s\\[\\d+\\]";
+        Pattern regex = Pattern.compile(pattern);
 
 
-            responseList = aTags.stream()
-                    .map(element ->
-                            new ScrapingResult(
-                                    element.attr("href").replace("/","").trim(),
-                                    regex.matcher(element.text()).replaceAll(""),
+        responseList = aTags.stream()
+                .map(element ->
+                        new ScrapingResult(
+                                element.attr("href").replace("/", "").trim(),
+                                regex.matcher(element.text()).replaceAll(""),
                                 fmKoreaPreFix + element.attr("href")
-                            )
-                    )
-                    .toList();
+                        )
+                )
+                .toList();
 
-            matchingIdxByLastData = GlobalUtil.findMatchingIdxByLastData(responseList, lastData);
+        matchingIdxByLastData = GlobalUtil.findMatchingIdxByLastData(responseList, lastData);
 
-            if (matchingIdxByLastData.isEmpty()) {
-                log.info("일치하는 단어가 없습니다. 다음 페이지에서 다시 가조오세요");
-            }
-
-            pageNum += 1;
-
-        } while (matchingIdxByLastData.isEmpty());
+        if (matchingIdxByLastData.isEmpty()) {
+            matchingIdxByLastData = OptionalInt.of(1);
+        }
 
         return GlobalUtil.getScrapingResult(responseList, matchingIdxByLastData);
     }

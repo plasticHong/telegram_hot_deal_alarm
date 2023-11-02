@@ -1,11 +1,11 @@
 package com.plastic.scraper.app.bean;
 
 import com.plastic.scraper.app.ScrapingResult;
+import com.plastic.scraper.app.util.GlobalUtil;
 import com.plastic.scraper.entity.HotDealRecord;
 import com.plastic.scraper.entity.RuliwebLastData;
 import com.plastic.scraper.repository.HotDealRecordRepo;
 import com.plastic.scraper.repository.RuliwebLastDataRepo;
-import com.plastic.scraper.app.util.GlobalUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Document;
@@ -61,13 +61,15 @@ public class RuliwebHotDealScraper {
                 .stream()
                 .findFirst();
 
-        if (byId.isEmpty()){return;}
+        if (byId.isEmpty()) {
+            return;
+        }
 
         byId.get().setArticleId(scrapedLastData.getArticleId());
         byId.get().setTitle(scrapedLastData.getTitle());
     }
 
-    private String getOriginalHotDealUrl(ScrapingResult scrapingResult){
+    private String getOriginalHotDealUrl(ScrapingResult scrapingResult) {
 
         String scrapedPageUrl = scrapingResult.getUrl();
 
@@ -85,32 +87,24 @@ public class RuliwebHotDealScraper {
 
         OptionalInt matchingIdxByLastData;
 
-        int pageNum = 1;
+        Document document = GlobalUtil.getDocumentByUrl(URL);
+        Elements aTags = findElement(document);
 
-        do {
+        responseList = aTags.stream()
+                .map(e ->
+                        new ScrapingResult(
+                                e.select(".id").text().trim(),
+                                e.select(".deco").select("a").text().trim(),
+                                e.select(".deco").select("a").attr("href")
+                        )
+                )
+                .toList();
 
-            Document document = GlobalUtil.getDocumentByUrl(URL, pageNum);
-            Elements aTags = findElement(document);
+        matchingIdxByLastData = GlobalUtil.findMatchingIdxByLastData(responseList, lastData);
 
-            responseList = aTags.stream()
-                    .map(e ->
-                            new ScrapingResult(
-                                    e.select(".id").text().trim(),
-                                    e.select(".deco").select("a").text().trim(),
-                                    e.select(".deco").select("a").attr("href")
-                            )
-                    )
-                    .toList();
-            
-            matchingIdxByLastData = GlobalUtil.findMatchingIdxByLastData(responseList, lastData);
-
-            if (matchingIdxByLastData.isEmpty()) {
-                log.info("일치하는 단어가 없습니다. 다음 페이지에서 다시 가조오세요");
-            }
-
-            pageNum += 1;
-
-        } while (matchingIdxByLastData.isEmpty());
+        if (matchingIdxByLastData.isEmpty()) {
+            matchingIdxByLastData = OptionalInt.of(1);
+        }
 
         return GlobalUtil.getScrapingResult(responseList, matchingIdxByLastData);
     }

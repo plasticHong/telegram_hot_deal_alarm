@@ -16,7 +16,11 @@ public class ScraperRunner {
 
     @Scheduled(fixedDelay = EVERY_MINUTE)
     public void run() {
-        scrapingManager.scrapingAndMessageSend();
+        try {
+            scrapingManager.scrapingAndMessageSend();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
